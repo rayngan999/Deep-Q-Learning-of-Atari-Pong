@@ -17,11 +17,15 @@ env = make_atari(env_id)
 env = wrap_deepmind(env)
 env = wrap_pytorch(env)
 
+#Amount of episodes
 num_frames = 1000000
 batch_size = 32
 gamma = 0.99
 record_idx = 10000
 
+# Replay buffer
+# The agent learn by sampling from the buffer
+# There are trainging "episodes" in the replay buffer which is just a frame and the next frame
 replay_initial = 10000
 replay_buffer = ReplayBuffer(100000)
 model = QLearner(env, num_frames, batch_size, gamma, replay_buffer)
@@ -50,6 +54,7 @@ state = env.reset()
 for frame_idx in range(1, num_frames + 1):
     #print("Frame: " + str(frame_idx))
 
+    # Usedd for exporation vs exploitation
     epsilon = epsilon_by_frame(frame_idx)
     action = model.act(state, epsilon)
     

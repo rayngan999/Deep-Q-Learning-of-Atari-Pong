@@ -34,7 +34,7 @@ class QLearner(nn.Module):
             nn.ReLU(),
             nn.Linear(512, self.num_actions)
         )
-        
+    
     def forward(self, x):
         x = self.features(x)
         x = x.view(x.size(0), -1)
@@ -47,11 +47,12 @@ class QLearner(nn.Module):
     def act(self, state, epsilon):
         if random.random() > epsilon:
             state = Variable(torch.FloatTensor(np.float32(state)).unsqueeze(0), requires_grad=True)
+
             # TODO: Given state, you should write code to get the Q value and chosen action
-            action = random.randrange(self.env.action_space.n)
-
-
-
+            # go to the next state using forward and this would be the q value
+            q_val = self.forward(state)
+            # we want to choose the max q_val for the action
+            action = q_val.max(1)[1].data[0]
 
 
         else:
@@ -65,15 +66,21 @@ class QLearner(nn.Module):
 def compute_td_loss(model, target_model, batch_size, gamma, replay_buffer):
     state, action, reward, next_state, done = replay_buffer.sample(batch_size)
 
-    state = Variable(torch.FloatTensor(np.float32(state)))
+    state = Variable(torch.FloatTensor(np.float32(state)).squeeze(1))
     next_state = Variable(torch.FloatTensor(np.float32(next_state)).squeeze(1), requires_grad=True)
     action = Variable(torch.LongTensor(action))
     reward = Variable(torch.FloatTensor(reward))
     done = Variable(torch.FloatTensor(done))
     # implement the loss function here
+    q_vals = model(state)
+    next_q_vals = model(next_state)
 
+    q_val = q_vals.gather(1, action.unsqueeze(1)).squeeze(1)
+    next_q_val = next_q_vals.max(1)[0]
+    expected_q_val = reward + gamma * next_q_val * (1 - done)
 
-    
+    loss = (q_val - Variable(expected_q_val)).pow(2).mean()
+
     return loss
 
 
@@ -89,8 +96,19 @@ class ReplayBuffer(object):
 
     def sample(self, batch_size):
         # TODO: Randomly sampling data with specific batch size from the buffer
-
-
+        # state, action, reward, next_state, done = zip(*random.sample(self.buffer, batch_size))
+        state = []
+        action = []
+        reward = []
+        next_state = []
+        done = []
+        for sample in random.sample(self.buffer, batch_size):
+            state.append(sample[0])
+            action.append(sample[1])
+            reward.append(sample[2])
+            next_state.append(sample[3])
+            done.append(sample[4])
+        
         return state, action, reward, next_state, done
 
     def __len__(self):
