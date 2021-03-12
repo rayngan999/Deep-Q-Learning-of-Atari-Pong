@@ -30,6 +30,7 @@ replay_initial = 10000
 replay_buffer = ReplayBuffer(100000)
 model = QLearner(env, num_frames, batch_size, gamma, replay_buffer)
 model.load_state_dict(torch.load("model_pretrained.pth", map_location='cpu'))
+torch.save(model.state_dict(), "model_trained.pth")
 
 target_model = QLearner(env, num_frames, batch_size, gamma, replay_buffer)
 target_model.copy_from(model)
