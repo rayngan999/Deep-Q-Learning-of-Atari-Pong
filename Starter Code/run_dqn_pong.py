@@ -30,7 +30,7 @@ replay_initial = 10000
 replay_buffer = ReplayBuffer(100000)
 model = QLearner(env, num_frames, batch_size, gamma, replay_buffer)
 model.load_state_dict(torch.load("model_pretrained.pth", map_location='cpu'))
-torch.save(model.state_dict(), "model_trained.pth")
+
 
 target_model = QLearner(env, num_frames, batch_size, gamma, replay_buffer)
 target_model.copy_from(model)
@@ -83,6 +83,13 @@ for frame_idx in range(1, num_frames + 1):
     if frame_idx % 10000 == 0 and len(replay_buffer) > replay_initial:
         print('#Frame: %d, Loss: %f' % (frame_idx, np.mean(losses, 0)[1]))
         print('Last-10 average reward: %f' % np.mean(all_rewards[-10:], 0)[1])
+        torch.save(model.state_dict(), "model_trained.pth")
+        with open ("losses.txt", "a") as f:
+            for loss in losses:
+                f.write('%s\n' % loss)
+        with open ("rewards.txt", "a") as f:
+            for reward in all_rewards:
+                f.write('%s\n' % reward) 
 
     if frame_idx % 50000 == 0:
         target_model.copy_from(model)
