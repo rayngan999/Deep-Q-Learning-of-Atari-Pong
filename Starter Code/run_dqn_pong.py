@@ -41,8 +41,8 @@ if USE_CUDA:
     target_model = target_model.cuda()
     print("Using cuda")
 
-epsilon_start = 0.8
-epsilon_final = 0.01
+epsilon_start = 0.001
+epsilon_final = 0.001
 epsilon_decay = 30000
 epsilon_by_frame = lambda frame_idx: epsilon_final + (epsilon_start - epsilon_final) * math.exp(-1. * frame_idx / epsilon_decay)
 
@@ -69,7 +69,7 @@ for frame_idx in range(1, num_frames + 1):
         state = env.reset()
         all_rewards.append((frame_idx, episode_reward))
         episode_reward = 0
-        with open ("rewards3.txt", "a") as f:
+        with open ("rewards5.txt", "a") as f:
             line = str(all_rewards[-1][0]) + " : " + str(np.mean(all_rewards[-10:], 0)[1])
             f.write('%s\n' %  line) 
     
@@ -79,7 +79,7 @@ for frame_idx in range(1, num_frames + 1):
         loss.backward()
         optimizer.step()
         losses.append((frame_idx, loss.data.cpu().numpy()))
-        with open ("losses3.txt", "a") as f:
+        with open ("losses5.txt", "a") as f:
             line = str(frame_idx) + " : " + str(np.mean(losses, 0)[1])
             f.write('%s\n' % line)
     
