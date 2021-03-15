@@ -69,7 +69,7 @@ for frame_idx in range(1, num_frames + 1):
         state = env.reset()
         all_rewards.append((frame_idx, episode_reward))
         episode_reward = 0
-        with open ("rewards6.txt", "a") as f:
+        with open ("rewards9.txt", "a") as f:
             line = str(all_rewards[-1][0]) + " : " + str(np.mean(all_rewards[-10:], 0)[1])
             f.write('%s\n' %  line) 
     
@@ -79,7 +79,7 @@ for frame_idx in range(1, num_frames + 1):
         loss.backward()
         optimizer.step()
         losses.append((frame_idx, loss.data.cpu().numpy()))
-        with open ("losses6.txt", "a") as f:
+        with open ("losses9.txt", "a") as f:
             line = str(frame_idx) + " : " + str(np.mean(losses, 0)[1])
             f.write('%s\n' % line)
     
