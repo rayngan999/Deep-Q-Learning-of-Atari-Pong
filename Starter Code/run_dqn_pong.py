@@ -41,8 +41,8 @@ if USE_CUDA:
     target_model = target_model.cuda()
     print("Using cuda")
 
-epsilon_start = 0.001
-epsilon_final = 0.001
+epsilon_start = 0.01
+epsilon_final = 0.01
 epsilon_decay = 30000
 epsilon_by_frame = lambda frame_idx: epsilon_final + (epsilon_start - epsilon_final) * math.exp(-1. * frame_idx / epsilon_decay)
 
