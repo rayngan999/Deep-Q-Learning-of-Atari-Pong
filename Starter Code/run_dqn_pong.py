@@ -52,7 +52,7 @@ episode_reward = 0
 
 state = env.reset()
 
-for frame_idx in range(163685, num_frames + 1):
+for frame_idx in range(185145, num_frames + 1):
     #print("Frame: " + str(frame_idx))
 
     # Usedd for exporation vs exploitation
