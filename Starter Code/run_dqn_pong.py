@@ -18,7 +18,7 @@ env = wrap_deepmind(env)
 env = wrap_pytorch(env)
 
 #Amount of episodes
-num_frames = 1000000
+num_frames = 2000000
 batch_size = 32
 gamma = 0.99
 record_idx = 10000
@@ -29,7 +29,7 @@ record_idx = 10000
 replay_initial = 10000
 replay_buffer = ReplayBuffer(100000)
 model = QLearner(env, num_frames, batch_size, gamma, replay_buffer)
-model.load_state_dict(torch.load("model_pretrained.pth", map_location='cpu'))
+model.load_state_dict(torch.load("model_trained.pth", map_location='cpu'))
 
 
 target_model = QLearner(env, num_frames, batch_size, gamma, replay_buffer)
@@ -41,7 +41,7 @@ if USE_CUDA:
     target_model = target_model.cuda()
     print("Using cuda")
 
-epsilon_start = 1.0
+epsilon_start = 0.01
 epsilon_final = 0.01
 epsilon_decay = 30000
 epsilon_by_frame = lambda frame_idx: epsilon_final + (epsilon_start - epsilon_final) * math.exp(-1. * frame_idx / epsilon_decay)
@@ -52,7 +52,7 @@ episode_reward = 0
 
 state = env.reset()
 
-for frame_idx in range(1, num_frames + 1):
+for frame_idx in range(1000000, num_frames + 1):
     #print("Frame: " + str(frame_idx))
 
     # Usedd for exporation vs exploitation
@@ -69,7 +69,7 @@ for frame_idx in range(1, num_frames + 1):
         state = env.reset()
         all_rewards.append((frame_idx, episode_reward))
         episode_reward = 0
-        with open ("rewards2.txt", "a") as f:
+        with open ("rewards2_1m,.txt", "a") as f:
             line = str(all_rewards[-1][0]) + " : " + str(np.mean(all_rewards[-10:], 0)[1])
             f.write('%s\n' %  line) 
     
@@ -79,7 +79,7 @@ for frame_idx in range(1, num_frames + 1):
         loss.backward()
         optimizer.step()
         losses.append((frame_idx, loss.data.cpu().numpy()))
-        with open ("losses2.txt", "a") as f:
+        with open ("losses2_1m.txt", "a") as f:
             line = str(frame_idx) + " : " + str(np.mean(losses, 0)[1])
             f.write('%s\n' % line)
     
@@ -90,7 +90,8 @@ for frame_idx in range(1, num_frames + 1):
         print('#Frame: %d, Loss: %f' % (frame_idx, np.mean(losses, 0)[1]))
         print('Last-10 average reward: %f' % np.mean(all_rewards[-10:], 0)[1])
         torch.save(model.state_dict(), "model_trained.pth")
-
+        losses = []
+        all_rewards =[]
         
         
 

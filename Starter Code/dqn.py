@@ -82,8 +82,8 @@ def compute_td_loss(model, target_model, batch_size, gamma, replay_buffer):
     output_val = reward + gamma * next_q_val * (1 - done)
     q_val = model(state).gather(1, action.unsqueeze(-1)).squeeze(-1)
     
-    # loss = nn.MSELoss(reduction="sum")(output_val, q_val)
-    loss = (output_val - q_val).pow(2).mean()
+    loss = nn.MSELoss(reduction="sum")(output_val, q_val)
+    # loss = (output_val - q_val).pow(2).mean()
     return loss
 
 
