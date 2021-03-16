@@ -52,7 +52,7 @@ episode_reward = 0
 
 state = env.reset()
 
-for frame_idx in range(221901, num_frames + 1):
+for frame_idx in range(570001, num_frames + 1):
     #print("Frame: " + str(frame_idx))
 
     # Usedd for exporation vs exploitation
@@ -90,7 +90,8 @@ for frame_idx in range(221901, num_frames + 1):
         print('#Frame: %d, Loss: %f' % (frame_idx, np.mean(losses, 0)[1]))
         print('Last-10 average reward: %f' % np.mean(all_rewards[-10:], 0)[1])
         torch.save(model.state_dict(), "model_trained.pth")
-
+        losses = []
+        all_rewards = []
         
         
 
