@@ -20,7 +20,7 @@ env = wrap_pytorch(env)
 #Amount of episodes
 num_frames = 1000000
 batch_size = 32
-gamma = 0.9
+gamma = 0.99
 record_idx = 10000
 
 # Replay buffer
@@ -69,8 +69,8 @@ for frame_idx in range(1, num_frames + 1):
         state = env.reset()
         all_rewards.append((frame_idx, episode_reward))
         episode_reward = 0
-        #with open ("rewards_2m.txt", "a") as f:
-           # line = str(all_rewards[-1][0]) + " : " + str(np.mean(all_rewards[-10:], 0)[1])
+        #with open ("rewards_2m_0.8.txt", "a") as f:
+            #line = str(all_rewards[-1][0]) + " : " + str(np.mean(all_rewards[-10:], 0)[1])
             #f.write('%s\n' %  line) 
     
     if len(replay_buffer) > replay_initial:
@@ -79,9 +79,9 @@ for frame_idx in range(1, num_frames + 1):
         loss.backward()
         optimizer.step()
         losses.append((frame_idx, loss.data.cpu().numpy()))
-        with open ("losses_redo.txt", "a") as f:
-            line = str(frame_idx) + " : " + str(losses[-1][1])
-            f.write('%s\n' % line)
+        #with open ("losses_redo_2.txt", "a") as f:
+            #line = str(frame_idx) + " : " + str(np.mean(losses, 0)[1])
+            #f.write('%s\n' % line)
     
     if frame_idx % 10000 == 0 and len(replay_buffer) <= replay_initial:
         print('#Frame: %d, preparing replay buffer' % frame_idx)
@@ -89,9 +89,12 @@ for frame_idx in range(1, num_frames + 1):
     if frame_idx % 10000 == 0 and len(replay_buffer) > replay_initial:
         print('#Frame: %d, Loss: %f' % (frame_idx, np.mean(losses, 0)[1]))
         print('Last-10 average reward: %f' % np.mean(all_rewards[-10:], 0)[1])
-        #torch.save(model.state_dict(), "model_trained.pth")
-        losses = []
-        all_rewards = []
+        with open ("losses_redo_2.txt", "a") as f:
+             line = str(frame_idx) + " : " + str(np.mean(losses, 0)[1])
+             f.write('%s\n' % line)
+        torch.save(model.state_dict(), "model_trained_redo.pth")
+        #losses = []
+        #all_rewards = []
         
         
 
